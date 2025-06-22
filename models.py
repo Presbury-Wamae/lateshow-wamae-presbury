@@ -17,13 +17,19 @@ class Episode(db.Model):
     # Optional: guests through appearances
     guests = association_proxy('appearances', 'guest')
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "date": self.date,
-            "number": self.number,
-            "appearances": [appearance.to_dict() for appearance in self.appearances]
+    def to_dict(self, only=None):
+        data = {
+        "id": self.id,
+        "date": self.date,
+        "number": self.number,
+        "appearances": [appearance.to_dict() for appearance in self.appearances]
         }
+
+        if only:
+            data = {key: data[key] for key in only if key in data}
+
+        return data
+
 
 class Guest(db.Model):
     __tablename__ = 'guests'
