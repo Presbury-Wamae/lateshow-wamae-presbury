@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify
-from models import Episode, Guest
+from flask import Blueprint, jsonify, request
+from models import Episode, Guest, Appearance, db
 
 episodes_bp = Blueprint('episodes_bp', __name__)
 
@@ -23,3 +23,32 @@ def get_guests():
     guests = Guest.query.all()
     guest_list = [guest.to_dict() for guest in guests]
     return jsonify(guest_list), 200
+
+@episodes_bp.route('/appearances', methods=['POST'])
+def create_appearance():
+    try:
+        data = request.get_json()
+        rating = data.get('rating')
+        episode_id = data.get('episode_id')
+        guest_id = data.get('guest_id')
+
+        # Validate episode and guest exist
+        episode = Episode.query.get(episode_id)
+        guest = Guest.query.get(guest_id)
+
+        if not episode or not guest:
+            return jsonify({"errors": ["Invalid episode_id or guest_id"]}), 422
+
+        appearance = Appearance(
+            rating=rating,
+            episode=episode,
+            guest=guest
+        )
+
+        db.session.add(appearance)
+        db.session.commit()
+
+        return jsonify(appearance.to_dict()), 201
+
+    except Exception as e:
+        return jsonify({"errors": [str(e)]}), 422
