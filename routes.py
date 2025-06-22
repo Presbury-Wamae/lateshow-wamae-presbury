@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from models import Episode
+from models import Episode, Guest
 
 episodes_bp = Blueprint('episodes_bp', __name__)
 
@@ -17,3 +17,9 @@ def get_episode_by_id(id):
         return jsonify(episode.to_dict()), 200
     else:
         return jsonify({"error": "Episode not found"}), 404
+    
+@episodes_bp.route('/guests', methods=['GET'])
+def get_guests():
+    guests = Guest.query.all()
+    guest_list = [guest.to_dict() for guest in guests]
+    return jsonify(guest_list), 200
