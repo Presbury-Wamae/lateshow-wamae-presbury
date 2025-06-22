@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from models import db, Episode, Guest, Appearance 
+from routes import episodes_bp
 
 # Initialize app
 app = Flask(__name__)
@@ -16,6 +17,8 @@ migrate = Migrate(app, db)
 @app.route('/')
 def index():
     return '<h1>Late Show API is running!</h1>'
+
+app.register_blueprint(episodes_bp) 
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
